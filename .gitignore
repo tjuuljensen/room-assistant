@@ -45,3 +45,6 @@ config/*.yml
 
 # Test Setup Utils
 update-test-instances.sh
+
+# Install
+!install/local.yml
