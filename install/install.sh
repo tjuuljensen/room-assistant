@@ -1,5 +1,11 @@
 #!/bin/bash
 
+### Installing dependencies
+echo '### Installing dependencies'
+sudo apt-get update 
+sudo apt-get install build-essential libavahi-compat-libdnssd-dev libsystemd-dev bluetooth libbluetooth-dev libudev-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+
+
 ### Installing NodeJS
 echo '### Installing NodeJS'
 
@@ -42,15 +48,12 @@ sudo ln -fs /opt/nodejs/bin/npm /usr/sbin/npm;
 sudo ln -fs /opt/nodejs/bin/npm /sbin/npm;
 sudo ln -fs /opt/nodejs/bin/npm /usr/local/bin/npm;
 
+
 ### Adding path to .profile
 echo '### Adding NodeJS to PATH in .profile'
 echo "PATH=""$PATH:/opt/nodejs/bin""" >> ~/.profile
 source ~/.profile
 
-### Installing dependencies
-echo '### Installing dependencies'
-sudo apt-get update 
-sudo apt-get install build-essential libavahi-compat-libdnssd-dev libsystemd-dev bluetooth libbluetooth-dev libudev-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
 ### Setting permissions for bluetooth integrations
 echo '### Setting permissions for bluetooth integrations'
@@ -58,15 +61,6 @@ sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 sudo setcap cap_net_raw+eip $(eval readlink -f `which hcitool`)
 sudo setcap cap_net_admin+eip $(eval readlink -f `which hciconfig`)
 
-### If hostname is raspberrypi, ask to change hostname
-if [[ $(hostname) == 'raspberrypi' ]] ; then
-    echo '### Optional change of hostname - It is recommended as Room Assistant will display hostname as the sensor state'
-    echo Current hostname is $HOSTNAME
-    read -r -p "Enter NEW hostname (or <Enter> to continue unchanged): " NEWHOSTNAME
-    if [ ! -z $NEWHOSTNAME ] ; then
-    sudo hostnamectl set-hostname --static "$NEWHOSTNAME"
-    fi
-fi
 
 ### Creating sample config file
 CONFIGDIR=~/room-assistant/config
@@ -122,6 +116,7 @@ WantedBy=multi-user.target" > $TMPFILE
 sudo mv $TMPFILE $SERVICEFILE
 sudo chown root $SERVICEFILE
 
+
 ### Install Room Assistant
 echo '### Installing Room Assistant'
 cd ~/room-assistant
@@ -135,6 +130,8 @@ else
   echo No config file found in $CONFIGDIR. Please create one and run room-assistant from this directory.
 fi
 
+
+### Enabling service
 if [[ -f $CONFIGFILE && -f $SERVICEFILE ]]; then
   echo "### Enabling and starting room assistant service..."
   sudo systemctl enable room-assistant.service
@@ -146,3 +143,13 @@ else
   echo   systemctl start room-assistant.service
 fi
 
+
+### If hostname is raspberrypi, ask to change hostname
+if [[ $(hostname) == 'raspberrypi' ]] ; then
+    echo '### Optional change of hostname - It is recommended as Room Assistant will display hostname as the sensor state'
+    echo Current hostname is $HOSTNAME
+    read -r -p "Enter NEW hostname (or <Enter> to continue unchanged): " NEWHOSTNAME
+    if [ ! -z $NEWHOSTNAME ] ; then
+    sudo hostnamectl set-hostname --static "$NEWHOSTNAME"
+    fi
+fi
