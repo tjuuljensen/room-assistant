@@ -47,5 +47,4 @@ config/*.yml
 update-test-instances.sh
 
 # Install
-install/*.yml
-!install/local.yml
+install/local.yml
