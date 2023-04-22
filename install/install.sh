@@ -5,6 +5,39 @@ echo '### Installing dependencies'
 sudo apt-get update 
 sudo apt-get install build-essential libavahi-compat-libdnssd-dev libsystemd-dev bluetooth libbluetooth-dev libudev-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
+### Installing unattended upgrades
+echo '### Installing unattended upgrades'
+sudo apt install -y unattended-upgrades 
+echo '### Creating unattended configuration file in /etc/apt/apt.conf.d/'
+echo 'Unattended-Upgrade::Origins-Pattern {
+//      Fix missing Rasbian sources.
+        "origin=Debian,codename=${distro_codename},label=Debian";
+        "origin=Debian,codename=${distro_codename},label=Debian-Security";
+        "origin=Raspbian,codename=${distro_codename},label=Raspbian";
+        "origin=Raspberry Pi Foundation,codename=${distro_codename},label=Raspberry Pi Foundation";
+};
+
+// Automatically reboot *WITHOUT CONFIRMATION* if
+//  the file /var/run/reboot-required is found after the upgrade
+Unattended-Upgrade::Automatic-Reboot "true";
+
+// If automatic reboot is enabled and needed, reboot at the specific
+// time instead of immediately
+//  Default: "now"
+Unattended-Upgrade::Automatic-Reboot-Time "03:00";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-raspbian
+
+echo 'APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "3";
+APT::Periodic::Verbose "1";
+APT::Periodic::Unattended-Upgrade "1";' | sudo tee /etc/apt/apt.conf.d/20auto-upgrades
+
+# TEST is MISSING: FIXME
+# sudo dpkg-reconfigure --priority=low unattended-upgrades
+
+# INFO: Unattended-updates result can be tested using this commend:
+# sudo unattended-upgrade -d -v --dry-run
+
 
 ### Installing NodeJS
 echo '### Installing NodeJS'
@@ -119,13 +152,13 @@ sudo chown root $SERVICEFILE
 
 ### Install Room Assistant
 echo '### Installing Room Assistant'
-cd ~/room-assistant
 sudo npm i --global --unsafe-perm room-assistant
 
 if [[ -f $CONFIGFILE ]]; then
-  echo '### Running room-assistant'
-  cd ~/room-assistant
-  room-assistant
+  echo '### Run check of room-assistant'
+  # cd ~/room-assistant
+  # room-assistant
+  echo room-assistant is now ready to run...
 else 
   echo No config file found in $CONFIGDIR. Please create one and run room-assistant from this directory.
 fi
