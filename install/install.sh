@@ -32,10 +32,9 @@ APT::Periodic::AutocleanInterval "3";
 APT::Periodic::Verbose "1";
 APT::Periodic::Unattended-Upgrade "1";' | sudo tee /etc/apt/apt.conf.d/20auto-upgrades
 
-# TEST is MISSING: FIXME
-# sudo dpkg-reconfigure --priority=low unattended-upgrades
-
-# INFO: Unattended-updates result can be tested using this commend:
+# Set autoanswer unattended upgrade mode
+sudo dpkg-reconfigure --priority=medium unattended-upgrades
+# INFO: Unattended-updates result can be tested using this command:
 # sudo unattended-upgrade -d -v --dry-run
 
 
@@ -179,7 +178,7 @@ fi
 
 ### If hostname is raspberrypi, ask to change hostname
 if [[ $(hostname) == 'raspberrypi' ]] ; then
-    echo '### Optional change of hostname - It is recommended as Room Assistant will display hostname as the sensor state'
+    echo '### Optional change of hostname'
     echo Current hostname is $HOSTNAME
     read -r -p "Enter NEW hostname (or <Enter> to continue unchanged): " NEWHOSTNAME
     if [ ! -z $NEWHOSTNAME ] ; then
